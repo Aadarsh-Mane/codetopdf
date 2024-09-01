@@ -7,8 +7,8 @@ This project allows users to submit code snippets through a web interface. The b
 Clone the repository using Git:
 
 ```bash
-git clone https://github.com/yourusername/your-repository.git
-cd your-repository
+git clone https://github.com/Aadarsh-Mane/codetopdf.git
+cd codetopdf
 ```
 ## Installation
 ### Backend
