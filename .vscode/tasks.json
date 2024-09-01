@@ -1,0 +1,37 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "java (build)",
+      "paths": ["${workspace}"],
+      "isFullBuild": true,
+      "group": "build",
+      "problemMatcher": [],
+      "label": "java (build): Build Workspace",
+      "detail": "$(tools) Build all the Java projects in workspace."
+    },
+    {
+      "label": "Build C++ file",
+      "type": "shell",
+      "command": "g++",
+      "args": ["-g", "your_file.cpp", "-o", "your_file"],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "problemMatcher": ["$gcc"],
+      "detail": "Build the C++ file using g++."
+    },
+    {
+      "label": "Run C++ file",
+      "type": "shell",
+      "command": "./your_file",
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "problemMatcher": [],
+      "detail": "Run the compiled C++ file."
+    }
+  ]
+}
