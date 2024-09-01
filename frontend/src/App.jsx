@@ -1,7 +1,7 @@
-import logo from "./logo.svg";
-import "./App.css";
-import React, { useState } from "react";
+import { useState } from 'react'
+import './App.css'
 import axios from "axios";
+
 function App() {
   const [code, setCode] = useState("");
   const [output, setOutput] = useState("");
@@ -24,21 +24,23 @@ function App() {
     }
   };
   return (
-    <div>
-      <h1>Online code to pdf</h1>
-      <textarea
-        rows="20"
-        cols="75"
-        value={code}
-        onChange={(e) => {
-          setCode(e.target.value);
-        }}
-      ></textarea>
-      <br />
-      <button onClick={handleSubmit}>Submit</button>
-      <p>{output}</p>
-    </div>
+    <>
+      <div>
+        <h1>Online code to pdf</h1>
+        <textarea
+          rows="20"
+          cols="75"
+          value={code}
+          onChange={(e) => {
+            setCode(e.target.value);
+          }}
+        ></textarea>
+        <br />
+        <button onClick={handleSubmit}>Submit</button>
+        <p>{output}</p>
+      </div>
+    </>
   );
 }
 
-export default App;
+export default App
