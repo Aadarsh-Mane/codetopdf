@@ -1,46 +1,44 @@
-import { useState } from 'react'
-import './App.css'
-import axios from "axios";
+import { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import TermsService from './components/TermsService';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import Home from './pages/Home';
+import NotFound from './pages/NotFound';
+import { PdfProvider } from './pages/PdfContext'; // Import the PdfProvider
+
+// Lazy load other components
+const CodeEditor = lazy(() => import('./pages/CodeEditor'));
+const PdfCustomizer = lazy(() => import('./pages/PdfCustomizer'));
+const AiSuggestions = lazy(() => import('./pages/AiSuggestions'));
+const Collaborate = lazy(() => import('./pages/Collaborate'));
 
 function App() {
-  const [code, setCode] = useState("");
-  const [output, setOutput] = useState("");
-  const handleSubmit = async () => {
-    // console.log(code);
-    const payload = {
-      langauge: "cpp",
-      code,
-    };
-    try {
-      const { data } = await axios.post("http://localhost:7000/run", payload);
-      setOutput(data.output);
-      // setCode("");
-      console.log(data);
-    } catch (error) {
-      console.error(error);
-      // setOutput("Error executing code");
-      const errorMessage = error.response?.data?.error || "Unknown error";
-      setOutput(errorMessage);
-    }
-  };
   return (
-    <>
-      <div>
-        <h1>Online code to pdf</h1>
-        <textarea
-          rows="20"
-          cols="75"
-          value={code}
-          onChange={(e) => {
-            setCode(e.target.value);
-          }}
-        ></textarea>
-        <br />
-        <button onClick={handleSubmit}>Submit</button>
-        <p>{output}</p>
+    <PdfProvider> {/* Wrap the app with PdfProvider */}
+      <div className="flex flex-col min-h-screen">
+        <Router>
+          <Navbar />
+          <main className="flex-grow pt-16">
+            <Suspense fallback={<div>Loading...</div>}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/editor" element={<CodeEditor />} />
+                <Route path="/customizer" element={<PdfCustomizer />} />
+                <Route path="/ai-suggestions" element={<AiSuggestions />} />
+                <Route path="/collaborate" element={<Collaborate />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/terms-of-service" element={<TermsService />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </main>
+          <Footer />
+        </Router>
       </div>
-    </>
+    </PdfProvider>
   );
 }
 
-export default App
+export default App;
