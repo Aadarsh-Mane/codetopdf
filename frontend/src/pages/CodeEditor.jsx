@@ -8,11 +8,13 @@ const CodeEditor = () => {
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
   const { setPdfOutput } = useContext(PdfContext); // Use context to set PDF output
+  const [language, setLanguage] = useState("cpp");
+
 
   // Handle code submission and output fetching
   const handleSubmit = async () => {
     const payload = {
-      language: "cpp",
+      language,
       code,
     };
 
@@ -26,6 +28,7 @@ const CodeEditor = () => {
       console.error(error);
       const errorMessage = error.response?.data?.error || "Unknown error";
       setOutput(errorMessage);
+
     } finally {
       setLoading(false);
     }
@@ -44,6 +47,21 @@ const CodeEditor = () => {
   return (
     <div className="min-h-screen pt-16 p-6 max-w-4xl mx-auto bg-white rounded-lg shadow-lg">
       <h1 className="text-3xl font-bold mb-4 text-gray-800">Online Code to PDF</h1>
+      <select value={language}
+        onChange={
+          (e) => {
+            setLanguage(e.target.value);
+            console.log(e.target.value);
+          }
+        }
+      >
+        <option value="cpp">C++</option>
+        <option value="c">C</option>
+        <option value="python">Python</option>
+        <option value="java">Java</option>
+        <option value="javascript">JavaScript</option>
+        <option value="ruby">Ruby</option>
+      </select>
       <div className="relative mb-6">
         <textarea
           rows="10"
