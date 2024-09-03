@@ -19,11 +19,13 @@ const __dirname = path.dirname(__filename);
 // }
 
 export const executePy = (filepath) => {
+  console.log(filepath);
   //   const jobId = path.basename(filepath).split(".")[0];
   //   const localOutput = path.join(outputPath, `${jobId}.out`);
+  const command = `python "${filepath}"`;
   try {
     return new Promise((resolve, reject) => {
-      exec(`python ${filepath}`, (error, stdout, stderr) => {
+      exec(command, (error, stdout, stderr) => {
         if (error) {
           const errorMessage = `Error executing Python code: ${stderr}`;
           console.error(errorMessage);
