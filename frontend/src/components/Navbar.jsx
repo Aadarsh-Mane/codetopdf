@@ -33,6 +33,12 @@ function Navbar() {
               PDF Customizer
             </Link>
             <Link
+              to="/done"
+              className="text-lg font-medium text-gray-700 hover:text-gray-500 transition duration-300"
+            >
+              collab
+            </Link>
+            <Link
               to="/ai-suggestions"
               className="text-lg font-medium text-gray-700 hover:text-gray-500 transition duration-300"
             >

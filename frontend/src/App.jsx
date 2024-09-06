@@ -7,6 +7,7 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import { PdfProvider } from './pages/PdfContext'; // Import the PdfProvider
+import JoinRoom from './pages/JoinRoom';
 
 // Lazy load other components
 const CodeEditor = lazy(() => import('./pages/CodeEditor'));
@@ -24,7 +25,9 @@ function App() {
             <Suspense fallback={<div>Loading...</div>}>
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/editor" element={<CodeEditor />} />
+                <Route path="/done" element={<JoinRoom />} />
+                <Route path="/editor/:roomId" element={<CodeEditor />} />
+                {/* <Route path="/editor" element={<CodeEditor />} /> */}
                 <Route path="/customizer" element={<PdfCustomizer />} />
                 <Route path="/ai-suggestions" element={<AiSuggestions />} />
                 <Route path="/collaborate" element={<Collaborate />} />
