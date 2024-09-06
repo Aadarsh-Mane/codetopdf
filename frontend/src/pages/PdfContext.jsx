@@ -6,10 +6,13 @@ const PdfContext = createContext();
 
 // Context Provider Component
 export const PdfProvider = ({ children }) => {
-  const [pdfOutput, setPdfOutput] = useState("");
+  const [pdfData, setPdfData] = useState({
+    code: "",
+    output: "",
+  });
 
   return (
-    <PdfContext.Provider value={{ pdfOutput, setPdfOutput }}>
+    <PdfContext.Provider value={{ pdfData, setPdfData }}>
       {children}
     </PdfContext.Provider>
   );
