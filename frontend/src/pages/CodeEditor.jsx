@@ -26,7 +26,7 @@ const CodeEditor = () => {
 
     setLoading(true);
     try {
-      const { data } = await axios.post("http://localhost:7000/run", payload);
+      const { data } = await axios.post("http://localhost:3000/run", payload);
       setOutput(data.output);
       setPdfData({ code, output: data.output });
     } catch (error) {

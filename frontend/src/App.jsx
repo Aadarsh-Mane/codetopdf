@@ -7,7 +7,9 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import { PdfProvider } from './pages/PdfContext'; // Import the PdfProvider
-import JoinRoom from './pages/CodeEditor';
+import CodeEditor1 from './pages/CodeEditor1';
+import JoinRoom from './pages/JoinRoom';
+import TextGenerator from './pages/GeminiAi';
 
 // Lazy load other components
 const CodeEditor = lazy(() => import('./pages/CodeEditor'));
@@ -26,11 +28,12 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/done" element={<JoinRoom />} />
-                {/* <Route path="/editor/:roomId" element={<CodeEditor />} /> */}
+                <Route path="/editor/:roomId" element={<CodeEditor1 />} />
                 <Route path="/editor" element={<CodeEditor />} />
                 <Route path="/customizer" element={<PdfCustomizer />} />
                 <Route path="/ai-suggestions" element={<AiSuggestions />} />
                 <Route path="/collaborate" element={<Collaborate />} />
+                <Route path="/next-ai" element={<TextGenerator />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/terms-of-service" element={<TermsService />} />
                 <Route path="*" element={<NotFound />} />

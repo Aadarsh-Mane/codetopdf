@@ -50,6 +50,12 @@ function Navbar() {
             >
               Collaborate
             </Link>
+            <Link
+              to="/next-ai"
+              className="text-lg font-medium text-gray-700 hover:text-gray-500 transition duration-300"
+            >
+              Next AI
+            </Link>
           </div>
           <div className="md:hidden">
             <button
