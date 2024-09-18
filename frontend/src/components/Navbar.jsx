@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-
+import logo from '../assets/logo.png';
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -8,7 +8,8 @@ function Navbar() {
     <nav className="bg-white shadow-md fixed top-0 left-0 w-full z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex-shrink-0">
+          <div className="flex items-center flex-shrink-0">
+            <img src={logo} alt='image' className='w-12 mr-2'/>
             <Link to="/" className="text-2xl font-semibold text-gray-800 hover:text-gray-600">
               Code2PDF
             </Link>
@@ -50,12 +51,12 @@ function Navbar() {
             >
               Collaborate
             </Link>
-            <Link
+            {/* <Link
               to="/next-ai"
               className="text-lg font-medium text-gray-700 hover:text-gray-500 transition duration-300"
             >
               Next AI
-            </Link>
+            </Link> */}
           </div>
           <div className="md:hidden">
             <button

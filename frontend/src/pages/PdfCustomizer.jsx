@@ -1,8 +1,8 @@
 import { useState, useContext } from 'react';
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { Document, Packer, Paragraph, TextRun } from 'docx';
 import { saveAs } from 'file-saver';
 import { PdfContext } from './PdfContext';
+import axios from 'axios';
 
 const PdfCustomizer = () => {
   const [content, setContent] = useState({
@@ -17,64 +17,6 @@ const PdfCustomizer = () => {
     setContent({ ...content, [name]: value });
   };
 
-  const generatePDF = async () => {
-    try {
-      // Create a new PDF document
-      const pdfDoc = await PDFDocument.create();
-  
-      // Add a page in A4 size (595.28 x 841.89 points)
-      const page = pdfDoc.addPage([595.28, 841.89]);
-  
-      const { title, body } = content;
-      const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
-      const fontSize = 12;
-  
-      // Centering and bold simulation for the title
-      if (title) {
-        const titleFontSize = 18;
-        const titleWidth = timesRomanFont.widthOfTextAtSize(title, titleFontSize);
-        const titleX = (page.getWidth() - titleWidth) / 2;
-  
-        // Draw the title twice slightly offset to simulate boldness
-        page.drawText(title.toUpperCase(), {
-          x: titleX,
-          y: page.getHeight() - 80, // Adjust Y for the title
-          size: titleFontSize,
-          font: timesRomanFont,
-          color: rgb(0, 0, 0),
-        });
-        page.drawText(title.toUpperCase(), {
-          x: titleX + 0.5,
-          y: page.getHeight() - 80 + 0.5,
-          size: titleFontSize,
-          font: timesRomanFont,
-          color: rgb(0, 0, 0),
-        });
-      }
-  
-      // Text with aim, theory, code, and output sections
-      const text = `Aim:${content.aim || ''}\n\n\n\bTheory:${body}\n\n\nCode:\n\n${pdfData.code || ''}\n\n\nOutput:\n\n${pdfData.output || ''}`;
-  
-      // Draw the rest of the text
-      page.drawText(text, {
-        x: 40,
-        y: page.getHeight() - 120, // Start text below the title
-        size: fontSize,
-        font: timesRomanFont,
-        color: rgb(0, 0, 0),
-        maxWidth: page.getWidth() - 80, // Keep text within the margins
-      });
-  
-      // Save the PDF and trigger download
-      const pdfBytes = await pdfDoc.save();
-      saveAs(new Blob([pdfBytes], { type: 'application/pdf' }), `${title || 'document'}.pdf`);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-    }
-  };
-  
-  
-
   const generateWord = () => {
     try {
       const doc = new Document({
@@ -85,44 +27,44 @@ const PdfCustomizer = () => {
             properties: {},
             children: [
               new Paragraph({
-                alignment: 'center', // Center the title
+                alignment: 'center',
                 children: [
                   new TextRun({ text: content.title, bold: true, size: 28 }),
                 ],
               }),
-              new Paragraph({ children: [new TextRun('\n')] }), // Add space after the title
+              new Paragraph({ children: [new TextRun('\n')] }),
               new Paragraph({
                 children: [
                   new TextRun({ text: 'Aim:\n', bold: true }),
                   new TextRun(content.aim),
                 ],
               }),
-              new Paragraph({ children: [new TextRun('\n')] }), // Add space before the theory section
+              new Paragraph({ children: [new TextRun('\n')] }),
               new Paragraph({
                 children: [
                   new TextRun({ text: 'Theory:\n', bold: true }),
                   new TextRun(content.body),
                 ],
               }),
-              new Paragraph({ children: [new TextRun('\n')] }), // Add space before the code section
+              new Paragraph({ children: [new TextRun('\n')] }),
               new Paragraph({
                 children: [
                   new TextRun({ text: 'Code:\n', bold: true }),
                   new TextRun(pdfData.code || ''),
                 ],
               }),
-              new Paragraph({ children: [new TextRun('\n')] }), // Add space before the output section
+              new Paragraph({ children: [new TextRun('\n')] }),
               new Paragraph({
                 shading: {
                   type: 'solid',
-                  color: 'E0E0E0', // Background color in hex (light gray)
-                  fill: 'E0E0E0', // Fill color in hex
+                  color: 'E0E0E0',
+                  fill: 'E0E0E0',
                 },
                 children: [
                   new TextRun({ text: 'Output:\n', bold: true }),
                   new TextRun({
                     text: pdfData.output || '',
-                    color: '000000', // Text color in hex (black)
+                    color: '000000',
                   }),
                 ],
               }),
@@ -130,7 +72,7 @@ const PdfCustomizer = () => {
           },
         ],
       });
-  
+
       Packer.toBlob(doc)
         .then((blob) => {
           saveAs(blob, `${content.title || 'document'}.docx`);
@@ -140,6 +82,69 @@ const PdfCustomizer = () => {
         });
     } catch (error) {
       console.error('Error in generateWord function:', error);
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    try {
+      const wordFileUrl = 'https://my.url/file.docx'; // Replace with your Word file URL
+
+      const response = await axios.post('https://sync.api.cloudconvert.com/v2/jobs', {
+        tasks: {
+          'import-my-file': {
+            operation: 'import/url',
+            url: wordFileUrl,
+          },
+          'convert-my-file': {
+            operation: 'convert',
+            input: 'import-my-file',
+            input_format: 'docx',
+            output_format: 'pdf',
+          },
+          'export-my-file': {
+            operation: 'export/url',
+            input: 'convert-my-file',
+          },
+        },
+        redirect: true,
+      }, {
+        headers: {
+          'Authorization': `Bearer YOUR_CLOUDCONVERT_API_KEY`, // Replace with your API key
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const jobId = response.data.data.id;
+
+      // Poll for the job status
+      const pollJobStatus = async () => {
+        try {
+          const jobResponse = await axios.get(`https://sync.api.cloudconvert.com/v2/jobs/${jobId}`, {
+            headers: {
+              'Authorization': `Bearer YOUR_CLOUDCONVERT_API_KEY`, // Replace with your API key
+            },
+          });
+
+          if (jobResponse.data.data.status === 'finished') {
+            const exportTask = jobResponse.data.data.tasks.find(task => task.name === 'export-my-file');
+            if (exportTask && exportTask.result && exportTask.result.files && exportTask.result.files.length > 0) {
+              window.open(exportTask.result.files[0].url, '_blank');
+            }
+          } else if (jobResponse.data.data.status === 'failed') {
+            console.error('Conversion failed.');
+          } else {
+            // Poll again in 5 seconds
+            setTimeout(pollJobStatus, 5000);
+          }
+        } catch (error) {
+          console.error('Error checking job status:', error);
+        }
+      };
+
+      // Start polling for job status
+      pollJobStatus();
+    } catch (error) {
+      console.error('Error creating conversion job:', error);
     }
   };
 
@@ -200,7 +205,7 @@ const PdfCustomizer = () => {
       </div>
       <div className="mb-4">
         <label htmlFor="output" className="block text-lg font-medium text-gray-700 mb-2">
-          Output from Code Editor
+          Output from Code Execution
         </label>
         <textarea
           id="output"
@@ -211,18 +216,24 @@ const PdfCustomizer = () => {
           className="w-full p-2 border border-gray-300 rounded-md bg-gray-100"
         ></textarea>
       </div>
-      <div className="mt-6 text-center space-x-4">
-        <button
+      <div className="flex gap-4">
+        {/* <button
           onClick={generatePDF}
-          className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-full hover:bg-blue-700 transition duration-300"
+          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
         >
           Download PDF
-        </button>
+        </button> */}
         <button
           onClick={generateWord}
-          className="bg-green-600 text-white font-semibold py-2 px-4 rounded-full hover:bg-green-700 transition duration-300"
+          className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
         >
           Download Word
+        </button>
+        <button
+          onClick={handleDownloadPDF}
+          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+        >
+          Download PDF
         </button>
       </div>
     </div>

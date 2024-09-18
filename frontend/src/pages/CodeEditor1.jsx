@@ -1,7 +1,15 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import axios from 'axios';  // For making HTTP requests
+import axios from 'axios'; // For making HTTP requests
 import { initSocket } from '../../socket';
+
+import CodeMirror from '@uiw/react-codemirror';
+import { cpp } from '@codemirror/lang-cpp';
+import { python } from '@codemirror/lang-python';
+import { java } from '@codemirror/lang-java';
+import { javascript } from '@codemirror/lang-javascript';
+import { EditorView } from '@codemirror/view';
 
 const CodeEditor1 = () => {
     const { roomId } = useParams();
@@ -97,7 +105,6 @@ const CodeEditor1 = () => {
         }
     };
 
-
     // Function to display notifications
     const showNotification = (message) => {
         setNotification(message);
@@ -108,49 +115,95 @@ const CodeEditor1 = () => {
         }, 3000);
     };
 
+    const getLanguageMode = () => {
+        switch (language) {
+          case "cpp":
+            return cpp();
+          case "python":
+            return python();
+          case "java":
+            return java();
+          case "javascript":
+            return javascript();
+          default:
+            return cpp();
+        }
+      };
+
+      const customTheme = EditorView.theme({
+        '&.cm-editor': {
+          fontSize: '22px', // Set your desired font size here
+        },
+        '.cm-content': {
+          fontFamily: 'monospace', // Set your preferred font family here
+        }
+      });
+
     return (
-        <div>
-            <h1>Room ID: {roomId}</h1>
-            <h1>Username: {username}</h1>
-            <div>
-                <label htmlFor="language">Select Language:</label>
+        <div className="max-w-7xl mx-auto p-8 bg-gray-50 shadow-md rounded-lg">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-bold text-gray-800">Collaborative Code Editor</h1>
+                <div className="text-sm text-gray-600">
+                    <span className="block">Room ID: {roomId}</span>
+                    <span className="block">Username: {username}</span>
+                </div>
+            </div>
+
+            <div className="flex items-center space-x-4 mb-4">
+                <label htmlFor="language" className="text-lg font-medium text-gray-700">
+                    Language:
+                </label>
                 <select
                     id="language"
                     value={language}
                     onChange={handleLanguageChange}
+                    className="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                     <option value="cpp">C++</option>
                     <option value="python">Python</option>
                     <option value="c">C</option>
                 </select>
+                <button
+                    onClick={handleExecuteCode}
+                    className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg shadow hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                >
+                    Run Code
+                </button>
             </div>
-            <textarea
+
+            <CodeMirror
                 value={code}
-                onChange={handleCodeChange}
-                style={{ width: '100%', height: '400px' }}
+                height="400px"
+                extensions={[getLanguageMode(), customTheme]}
+                onChange={(value) => setCode(value)}
+                placeholder="Write your code here..."
             />
-            <button onClick={handleExecuteCode}>Run Code</button>
 
             {notification && (
-                <div style={{ backgroundColor: '#ffd700', padding: '10px', marginTop: '10px' }}>
+                <div className="mb-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
                     <strong>{notification}</strong>
                 </div>
             )}
 
-            <h2>Connected Clients:</h2>
-            <ul>
-                {Array.isArray(clients) && clients.length > 0 ? (
-                    // Use a Set to remove duplicate usernames
-                    [...new Set(clients.map(client => client.username))].map((username, index) => (
-                        <li key={index}>{username}</li>
-                    ))
-                ) : (
-                    <li>No clients connected</li>
-                )}
-            </ul>
+            <div className="mb-6">
+                <h2 className="text-lg font-semibold text-gray-700">Connected Clients</h2>
+                <ul className="list-disc list-inside text-gray-600">
+                    {Array.isArray(clients) && clients.length > 0 ? (
+                        [...new Set(clients.map(client => client.username))].map((username, index) => (
+                            <li key={index}>{username}</li>
+                        ))
+                    ) : (
+                        <li>No clients connected</li>
+                    )}
+                </ul>
+            </div>
 
-            <h2>Output:</h2>
-            <pre>{output || error}</pre>
+            <div className="mb-4">
+                <h2 className="text-lg font-semibold text-gray-700">Output</h2>
+                <pre className="w-full h-64 p-4 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 whitespace-pre-wrap">
+                    {output || error}
+                </pre>
+            </div>
         </div>
     );
 };
